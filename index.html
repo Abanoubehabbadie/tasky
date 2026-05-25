@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>🚀 Task System</h1>
+
+<!-- LOGIN -->
+<div class="box">
+  <h2>Login</h2>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <button onclick="signup()">Sign Up</button>
+</div>
+
+<!-- CREATE TASK -->
+<div class="box">
+  <h2>Create Task</h2>
+  <input id="title" placeholder="Task title">
+  <input id="desc" placeholder="Description">
+  <input id="phone" placeholder="Phone (ex: 201234567890)">
+  <button onclick="createTask()">Add Task</button>
+</div>
+
+<!-- FILTER -->
+<div>
+  <button onclick="loadTasks()">All</button>
+  <button onclick="filterTasks('pending')">Pending</button>
+  <button onclick="filterTasks('in progress')">In Progress</button>
+  <button onclick="filterTasks('done')">Done</button>
+</div>
+
+<!-- TASKS -->
+<div id="tasks"></div>
+
+<!-- Firebase scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script src="app.js"></script>
+
+</body>
+</html>

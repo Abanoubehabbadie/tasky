@@ -17,7 +17,7 @@ let currentFilter = 'all';
 let allTasks = [];
 
 // Define the main receiver email (tasks assigned to this user are visible to all)
-const MAIN_RECEIVER = "receiver@tasky.com"; // Change this to your main receiver email
+const MAIN_RECEIVER = "abnoob.kolta@bua.edu.eg";
 
 // 🔑 TRACK LOGIN STATE
 auth.onAuthStateChanged(user => {

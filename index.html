@@ -36,14 +36,25 @@
         <input id="password" type="password" placeholder="••••••••">
       </div>
 
+      <!-- Phone field for signup -->
+      <div class="form-group" id="phoneGroupSignup" style="display: none;">
+        <label for="phoneSignup">Phone Number (with country code) *</label>
+        <input id="phoneSignup" type="tel" placeholder="+201234567890">
+      </div>
+
       <div class="auth-buttons">
         <button onclick="login()" class="btn btn-primary">
           <i class="fas fa-sign-in-alt"></i> Login
         </button>
-        <button onclick="signup()" class="btn btn-secondary">
+        <button onclick="toggleSignupMode()" class="btn btn-secondary" id="signupToggleBtn">
           <i class="fas fa-user-plus"></i> Sign Up
         </button>
       </div>
+
+      <!-- Hidden signup button -->
+      <button onclick="signup()" class="btn btn-primary btn-large" id="confirmSignupBtn" style="display: none; width: 100%; margin-top: 10px;">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
     </div>
   </div>
 
@@ -82,7 +93,8 @@
 
           <div class="form-group">
             <label for="phone">Contact Phone (for notifications) *</label>
-            <input id="phone" type="tel" placeholder="+201234567890 (with country code)">
+            <input id="phone" type="tel" placeholder="+201234567890 (with country code)" readonly>
+            <small style="color: #666; margin-top: 5px;">Auto-filled from your profile</small>
           </div>
 
           <div class="form-group">

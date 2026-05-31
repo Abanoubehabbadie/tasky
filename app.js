@@ -16,6 +16,9 @@ let currentSortBy = 'dateCreated';
 let currentFilter = 'all';
 let allTasks = [];
 
+// Define the main receiver email (tasks assigned to this user are visible to all)
+const MAIN_RECEIVER = "receiver@tasky.com"; // Change this to your main receiver email
+
 // 🔑 TRACK LOGIN STATE
 auth.onAuthStateChanged(user => {
   const authSection = document.getElementById("authSection");
@@ -134,13 +137,13 @@ function createTask() {
     dueDate: dueDate || null,
     assignee: assignee || null,
     createdBy: currentUserEmail,
-    assignedTo: null,
+    assignedTo: MAIN_RECEIVER, // Automatically assign to main receiver
     status: "pending",
     dateCreated: new Date(),
     updatedAt: new Date()
   })
   .then(() => {
-    showToast("Task created successfully!", "success");
+    showToast("Task created successfully and sent to receiver!", "success");
     // Clear form
     document.getElementById("title").value = "";
     document.getElementById("desc").value = "";
@@ -154,8 +157,9 @@ function createTask() {
   });
 }
 
-// ✅ LOAD TASKS (REAL-TIME)
+// ✅ LOAD TASKS (REAL-TIME) - Modified to show all relevant tasks
 function loadTasks() {
+  // Get tasks created by user OR assigned to user
   db.collection("tasks")
     .where("createdBy", "==", currentUserEmail)
     .onSnapshot(snapshot => {
@@ -166,7 +170,35 @@ function loadTasks() {
           ...doc.data()
         });
       });
+      
+      // Also get tasks assigned to this user
+      loadAssignedTasks();
+    }, err => {
+      showToast(`Error loading tasks: ${err.message}`, "error");
+    });
+}
+
+// ✅ LOAD ASSIGNED TASKS
+function loadAssignedTasks() {
+  db.collection("tasks")
+    .where("assignedTo", "==", currentUserEmail)
+    .onSnapshot(snapshot => {
+      // Add assigned tasks to the list (avoid duplicates)
+      snapshot.forEach(doc => {
+        const taskId = doc.id;
+        const existingTask = allTasks.find(t => t.id === taskId);
+        
+        if (!existingTask) {
+          allTasks.push({
+            id: taskId,
+            ...doc.data()
+          });
+        }
+      });
+      
       applyFilterAndSort();
+    }, err => {
+      console.error("Error loading assigned tasks:", err);
     });
 }
 
@@ -247,6 +279,9 @@ function renderTasks(tasks) {
       new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 
       'No date';
 
+    const isCreatedByMe = task.createdBy === currentUserEmail;
+    const isAssignedToMe = task.assignedTo === currentUserEmail;
+
     const taskCard = document.createElement('div');
     taskCard.className = `task-card ${priorityClass}`;
     taskCard.innerHTML = `
@@ -262,6 +297,7 @@ function renderTasks(tasks) {
         ${task.priority ? `<div class="task-meta-item"><i class="fas fa-flag"></i> ${task.priority}</div>` : ''}
         ${task.dueDate ? `<div class="task-meta-item"><i class="fas fa-calendar"></i> ${dueDateText}</div>` : ''}
         ${task.assignedTo ? `<div class="task-meta-item"><i class="fas fa-user"></i> ${task.assignedTo}</div>` : ''}
+        ${task.createdBy ? `<div class="task-meta-item"><i class="fas fa-user-check"></i> By: ${task.createdBy}</div>` : ''}
       </div>
 
       ${task.desc ? `<div class="task-desc">${escapeHtml(task.desc)}</div>` : ''}
@@ -273,11 +309,11 @@ function renderTasks(tasks) {
       </div>
 
       <div class="task-footer">
-        ${task.status === 'pending' ? 
+        ${task.status === 'pending' && isAssignedToMe ? 
           `<button class="task-btn task-btn-take" onclick="takeTask('${task.id}')">
             <i class="fas fa-hand-paper"></i> Take Task
           </button>` : 
-          task.status === 'in progress' ? 
+          task.status === 'in progress' && isAssignedToMe ? 
           `<button class="task-btn task-btn-done" onclick="finishTask('${task.id}', '${escapeHtml(task.phone)}')">
             <i class="fas fa-check"></i> Mark Done
           </button>` : 
@@ -286,9 +322,12 @@ function renderTasks(tasks) {
         <button class="task-btn task-btn-notify" onclick="sendWhatsAppNotification('${escapeHtml(task.phone)}', '${escapeHtml(task.title)}')">
           <i class="fab fa-whatsapp"></i> Notify
         </button>
-        <button class="task-btn task-btn-delete" onclick="deleteTask('${task.id}')">
-          <i class="fas fa-trash"></i> Delete
-        </button>
+        ${isCreatedByMe ? 
+          `<button class="task-btn task-btn-delete" onclick="deleteTask('${task.id}')">
+            <i class="fas fa-trash"></i> Delete
+          </button>` : 
+          ''
+        }
       </div>
     `;
 
@@ -299,12 +338,11 @@ function renderTasks(tasks) {
 // ✅ TAKE TASK
 function takeTask(id) {
   db.collection("tasks").doc(id).update({
-    assignedTo: currentUserEmail,
     status: "in progress",
     updatedAt: new Date()
   })
   .then(() => {
-    showToast("Task assigned to you!", "success");
+    showToast("Task started! You're working on it now.", "success");
   })
   .catch(err => {
     showToast(`Error: ${err.message}`, "error");

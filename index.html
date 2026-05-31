@@ -1,42 +1,154 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Task System</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tasky - Task Management System</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
 
-<h1>🚀 Task System</h1>
+<!-- HEADER -->
+<header class="header">
+  <div class="header-content">
+    <h1><i class="fas fa-tasks"></i> Tasky</h1>
+    <div class="user-info" id="userInfo"></div>
+  </div>
+</header>
 
-<!-- LOGIN -->
-<div class="box">
-  <h2>Login</h2>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <button onclick="signup()">Sign Up</button>
+<div class="container">
+
+  <!-- AUTH SECTION -->
+  <div id="authSection" class="auth-section">
+    <div class="auth-card">
+      <h2>Welcome to Tasky</h2>
+      <p>Manage your tasks efficiently with real-time updates</p>
+      
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input id="email" type="email" placeholder="your@email.com">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="••••••••">
+      </div>
+
+      <div class="auth-buttons">
+        <button onclick="login()" class="btn btn-primary">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+        <button onclick="signup()" class="btn btn-secondary">
+          <i class="fas fa-user-plus"></i> Sign Up
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP SECTION -->
+  <div id="appSection" class="app-section" style="display: none;">
+
+    <!-- CREATE TASK SECTION -->
+    <section class="create-task-section">
+      <div class="card">
+        <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="title">Task Title *</label>
+            <input id="title" type="text" placeholder="Enter task title" required>
+          </div>
+
+          <div class="form-group">
+            <label for="priority">Priority</label>
+            <select id="priority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="desc">Description</label>
+            <textarea id="desc" placeholder="Enter task details" rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="dueDate">Due Date</label>
+            <input id="dueDate" type="date">
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Contact Phone (for notifications) *</label>
+            <input id="phone" type="tel" placeholder="+201234567890 (with country code)">
+          </div>
+
+          <div class="form-group">
+            <label for="assignee">Assign To</label>
+            <input id="assignee" type="text" placeholder="Team member email">
+          </div>
+        </div>
+
+        <button onclick="createTask()" class="btn btn-primary btn-large">
+          <i class="fas fa-plus"></i> Add Task
+        </button>
+      </div>
+    </section>
+
+    <!-- FILTER & SORT SECTION -->
+    <section class="filter-section">
+      <div class="filter-controls">
+        <div class="filter-buttons">
+          <button onclick="sortBy('dateCreated')" class="filter-btn active">
+            <i class="fas fa-calendar"></i> Recent
+          </button>
+          <button onclick="sortBy('priority')" class="filter-btn">
+            <i class="fas fa-flag"></i> Priority
+          </button>
+          <button onclick="sortBy('dueDate')" class="filter-btn">
+            <i class="fas fa-hourglass-end"></i> Due Date
+          </button>
+        </div>
+
+        <div class="status-filters">
+          <button onclick="filterTasks('all')" class="status-btn active" data-status="all">
+            All Tasks
+          </button>
+          <button onclick="filterTasks('pending')" class="status-btn" data-status="pending">
+            <span class="badge-pending"></span> Pending
+          </button>
+          <button onclick="filterTasks('in progress')" class="status-btn" data-status="in progress">
+            <span class="badge-progress"></span> In Progress
+          </button>
+          <button onclick="filterTasks('done')" class="status-btn" data-status="done">
+            <span class="badge-done"></span> Done
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TASKS DISPLAY SECTION -->
+    <section class="tasks-section">
+      <div id="tasks" class="tasks-container"></div>
+      <div id="noTasks" class="empty-state" style="display: none;">
+        <i class="fas fa-inbox"></i>
+        <p>No tasks found. Create one to get started!</p>
+      </div>
+    </section>
+
+  </div>
+
 </div>
 
-<!-- CREATE TASK -->
-<div class="box">
-  <h2>Create Task</h2>
-  <input id="title" placeholder="Task title">
-  <input id="desc" placeholder="Description">
-  <input id="phone" placeholder="Phone (ex: 201234567890)">
-  <button onclick="createTask()">Add Task</button>
-</div>
+<!-- NOTIFICATION TOAST -->
+<div id="toast" class="toast"></div>
 
-<!-- FILTER -->
-<div>
-  <button onclick="loadTasks()">All</button>
-  <button onclick="filterTasks('pending')">Pending</button>
-  <button onclick="filterTasks('in progress')">In Progress</button>
-  <button onclick="filterTasks('done')">Done</button>
-</div>
-
-<!-- TASKS -->
-<div id="tasks"></div>
+<!-- LOGOUT BUTTON (hidden initially) -->
+<button onclick="logout()" id="logoutBtn" class="btn btn-danger btn-floating" style="display: none;">
+  <i class="fas fa-sign-out-alt"></i> Logout
+</button>
 
 <!-- Firebase scripts -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>

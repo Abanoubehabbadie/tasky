@@ -12,9 +12,11 @@ const db = firebase.firestore();
 
 let currentUser = null;
 let currentUserEmail = null;
+let currentUserPhone = null;
 let currentSortBy = 'dateCreated';
 let currentFilter = 'all';
 let allTasks = [];
+let isSignupMode = false;
 
 // Define the main receiver email (tasks assigned to this user are visible to all)
 const MAIN_RECEIVER = "abnoob.kolta@bua.edu.eg";
@@ -29,6 +31,9 @@ auth.onAuthStateChanged(user => {
   if (user) {
     currentUser = user.uid;
     currentUserEmail = user.email;
+    
+    // Load user's phone from Firestore
+    loadUserProfile();
     
     // Show app section
     authSection.style.display = "none";
@@ -47,24 +52,94 @@ auth.onAuthStateChanged(user => {
     logoutBtn.style.display = "none";
     userInfo.innerHTML = "";
     allTasks = [];
+    currentUserPhone = null;
+    isSignupMode = false;
+    resetAuthForm();
   }
 });
+
+// ✅ TOGGLE SIGNUP MODE
+function toggleSignupMode() {
+  isSignupMode = !isSignupMode;
+  const phoneGroup = document.getElementById("phoneGroupSignup");
+  const signupToggleBtn = document.getElementById("signupToggleBtn");
+  const confirmSignupBtn = document.getElementById("confirmSignupBtn");
+  const loginBtn = document.querySelector(".btn-primary");
+
+  if (isSignupMode) {
+    phoneGroup.style.display = "block";
+    confirmSignupBtn.style.display = "block";
+    signupToggleBtn.style.display = "none";
+    loginBtn.style.display = "none";
+  } else {
+    phoneGroup.style.display = "none";
+    confirmSignupBtn.style.display = "none";
+    signupToggleBtn.style.display = "block";
+    loginBtn.style.display = "block";
+  }
+}
+
+// ✅ RESET AUTH FORM
+function resetAuthForm() {
+  document.getElementById("email").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("phoneSignup").value = "";
+  isSignupMode = false;
+  document.getElementById("phoneGroupSignup").style.display = "none";
+  document.getElementById("signupToggleBtn").style.display = "block";
+  document.getElementById("confirmSignupBtn").style.display = "none";
+  document.querySelector(".btn-primary").style.display = "block";
+}
+
+// ✅ LOAD USER PROFILE
+function loadUserProfile() {
+  db.collection("users").doc(currentUser).get()
+    .then(doc => {
+      if (doc.exists) {
+        currentUserPhone = doc.data().phone || null;
+        // Auto-fill phone in task form
+        if (currentUserPhone) {
+          document.getElementById("phone").value = currentUserPhone;
+        }
+      }
+    })
+    .catch(err => {
+      console.error("Error loading user profile:", err);
+    });
+}
 
 // ✅ SIGN UP
 function signup() {
   const email = document.getElementById("email").value.trim();
   const pass = document.getElementById("password").value;
+  const phone = document.getElementById("phoneSignup").value.trim();
 
-  if (!email || !pass) {
+  if (!email || !pass || !phone) {
     showToast("Please fill in all fields", "error");
     return;
   }
 
+  // Phone validation
+  if (!/^\+?[0-9]{10,15}$/.test(phone.replace(/\s/g, ''))) {
+    showToast("Please enter a valid phone number with country code (e.g., +201234567890)", "error");
+    return;
+  }
+
   auth.createUserWithEmailAndPassword(email, pass)
-    .then(() => {
-      showToast("Account created successfully! Please login.", "success");
-      document.getElementById("email").value = "";
-      document.getElementById("password").value = "";
+    .then((userCredential) => {
+      // Save phone to Firestore
+      db.collection("users").doc(userCredential.user.uid).set({
+        email: email,
+        phone: phone,
+        createdAt: new Date()
+      })
+      .then(() => {
+        showToast("Account created successfully! Please login.", "success");
+        resetAuthForm();
+      })
+      .catch(err => {
+        showToast(`Error saving profile: ${err.message}`, "error");
+      });
     })
     .catch(err => {
       showToast(`Sign up failed: ${err.message}`, "error");
@@ -84,8 +159,7 @@ function login() {
   auth.signInWithEmailAndPassword(email, pass)
     .then(() => {
       showToast("Logged in successfully!", "success");
-      document.getElementById("email").value = "";
-      document.getElementById("password").value = "";
+      resetAuthForm();
     })
     .catch(err => {
       showToast(`Login failed: ${err.message}`, "error");
@@ -119,7 +193,7 @@ function createTask() {
   }
 
   if (!phone) {
-    showToast("Please enter a contact phone number", "error");
+    showToast("Please add your phone number in your profile first", "error");
     return;
   }
 
@@ -147,7 +221,6 @@ function createTask() {
     // Clear form
     document.getElementById("title").value = "";
     document.getElementById("desc").value = "";
-    document.getElementById("phone").value = "";
     document.getElementById("priority").value = "medium";
     document.getElementById("dueDate").value = "";
     document.getElementById("assignee").value = "";

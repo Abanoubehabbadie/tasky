@@ -4,17 +4,21 @@ Use this template to quickly create quizzes, midterms, practicals, or any exam. 
 
 Course Name: [______________________]
 Course Code: [______________________]
+Course Semester: [______________________]
+Instructor Name: [______________________]
 
 Exam Type: [Quiz 1 / Quiz 2 / Quiz 3 / Midterm / Practical / Other: ________]
 Date (optional): [YYYY-MM-DD]
 Duration: [______ minutes]
 Total Marks: [______]
 
-Instructions:
-- Read all questions carefully.
-- Answer the questions in the space provided or on separate answer sheets as instructed.
-- Show all workings where applicable.
-- Write your name and student ID on every page.
+Instructions (short):
+- Answer all questions. Write your name and student ID on every page.
+
+Instructions (long):
+- Read all questions carefully. Manage your time. Show all workings where applicable. Use the space provided or separate answer sheets as instructed. Mobile phones and calculators rules: follow the course policy. If you have any clarification requests, raise them early.
+
+You can use the standalone section below to create an exam without logging in to the app.
 
 ---
 
@@ -28,17 +32,19 @@ Standalone template (no login required)
 
 Course Name: [______________________]
 Course Code: [______________________]
+Course Semester: [______________________]
+Instructor Name: [______________________]
 
 Exam Type: [Quiz 1 / Quiz 2 / Quiz 3 / Midterm / Practical / Other: ________]
 Date (optional): [YYYY-MM-DD]
 Duration: [______ minutes]
 Total Marks: [______]
 
-Instructions:
-- Read all questions carefully.
-- Answer the questions in the space provided or on separate answer sheets as instructed.
-- Show all workings where applicable.
-- Write your name and student ID on every page.
+Instructions (short):
+- Answer all questions. Write your name and student ID on every page.
+
+Instructions (long):
+- Read all questions carefully. Manage your time. Show all workings where applicable. Use the space provided or separate answer sheets as instructed. Mobile phones and calculators rules: follow the course policy. If you have any clarification requests, raise them early.
 
 ---
 
@@ -111,8 +117,21 @@ Section D — Practical / Long Questions
 
 ---
 
+How to generate .docx files from courses.xlsx
+
+This repository includes a script scripts/generate_exams.py that reads an XLSX file with course rows and produces .docx exam files filled from the template. Example usage:
+
+1. Install dependencies:
+
+   pip install -r requirements.txt
+
+2. Run the generator (examples):
+
+   python scripts/generate_exams.py courses.xlsx --out generated-exams
+
+The script looks for columns named (case-insensitive) "Course Code", "Course Name", "Semester" and "Instructor". If Semester or Instructor are not present in the sheet the script will leave those fields blank in the generated exam.
+
 Notes:
-- To include the date, replace the Date field above with the exam date.
-- You can add or remove sections depending on the exam type (e.g., omit Section D for short quizzes).
-- Make a copy of this template for each exam and fill in the course name and code at the top.
-- To create an exam without logging in: copy the "Standalone template" section and use it locally or in any editor.
+- The generator creates files named generated-exams/exam-{COURSECODE}.docx.
+- By default the script processes the first worksheet in the XLSX. You can pass --sheet "SheetName" to select a different sheet.
+

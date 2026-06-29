@@ -18,6 +18,30 @@ Instructions:
 
 ---
 
+Create without logging in
+
+If you want to create an exam without signing in to the app, use the standalone copy of the template below. Copy the content, paste it into any text editor or online editor (Google Docs, Word, StackEdit, etc.), fill the placeholders, then save or print. No account or login is required.
+
+Privacy note: If you use online editors, check their privacy settings before sharing student data.
+
+Standalone template (no login required)
+
+Course Name: [______________________]
+Course Code: [______________________]
+
+Exam Type: [Quiz 1 / Quiz 2 / Quiz 3 / Midterm / Practical / Other: ________]
+Date (optional): [YYYY-MM-DD]
+Duration: [______ minutes]
+Total Marks: [______]
+
+Instructions:
+- Read all questions carefully.
+- Answer the questions in the space provided or on separate answer sheets as instructed.
+- Show all workings where applicable.
+- Write your name and student ID on every page.
+
+---
+
 Section A — Multiple Choice Questions (Each question: 1 mark)
 1. [Question text here]
    A. [Option A]
@@ -91,3 +115,4 @@ Notes:
 - To include the date, replace the Date field above with the exam date.
 - You can add or remove sections depending on the exam type (e.g., omit Section D for short quizzes).
 - Make a copy of this template for each exam and fill in the course name and code at the top.
+- To create an exam without logging in: copy the "Standalone template" section and use it locally or in any editor.

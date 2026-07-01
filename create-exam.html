@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Create Exam — Tasky</title>
+  <link rel="stylesheet" href="/style.css" />
+  <!-- Pinned CDN libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.20.1/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+</head>
+<body>
+  <main style="padding:24px;max-width:900px;margin:0 auto;">
+    <h1>Create Exam</h1>
+    <p>This page loads courses from <code>courses.xlsx</code> (first worksheet) and lets you filter by Department and Level. If the remote file cannot be loaded due to CORS or network, use the Upload control to supply a local copy.</p>
+
+    <section id="loader" style="margin-bottom:16px;">
+      <button id="tryLoad">Load courses.xlsx from repository</button>
+      <span id="loadStatus" style="margin-left:12px;color:#666"></span>
+      <div style="margin-top:8px;">Or upload your own <code>courses.xlsx</code>: <input id="uploadXlsx" type="file" accept=".xlsx,.xls" /></div>
+    </section>
+
+    <section id="filters" style="display:none;border:1px solid #eee;padding:12px;margin-bottom:12px;background:#fafafa;">
+      <h2>Filter courses</h2>
+      <div>
+        <label for="deptSelect">Department:</label>
+        <select id="deptSelect"><option value="">(all)</option></select>
+        <label for="levelSelect" style="margin-left:12px;">Level/Year:</label>
+        <select id="levelSelect"><option value="">(all)</option></select>
+      </div>
+      <div style="margin-top:8px;">
+        <label for="courseSelect">Course:</label>
+        <select id="courseSelect"></select>
+        <button id="createExamBtn" style="margin-left:8px;">Create exam for selected course</button>
+      </div>
+    </section>
+
+    <section id="examForm" style="display:none;border:1px solid #eee;padding:12px;background:#fff;">
+      <h2>Exam details</h2>
+      <div><label>Course Name:</label> <span id="f_courseName"></span></div>
+      <div><label>Course Code:</label> <span id="f_courseCode"></span></div>
+      <div><label>Department:</label> <span id="f_dept"></span></div>
+      <div><label>Level:</label> <span id="f_level"></span></div>
+
+      <div style="margin-top:8px;">
+        <label for="f_examTitle">Exam Title:</label>
+        <input id="f_examTitle" type="text" style="width:60%" />
+      </div>
+      <div>
+        <label for="f_examType">Exam Type:</label>
+        <input id="f_examType" type="text" placeholder="Quiz / Midterm / Final" />
+        <label for="f_examDate" style="margin-left:12px;">Date:</label>
+        <input id="f_examDate" type="date" />
+      </div>
+      <div>
+        <label for="f_duration">Duration (minutes):</label>
+        <input id="f_duration" type="number" min="0" />
+        <label for="f_totalMarks" style="margin-left:12px;">Total Marks:</label>
+        <input id="f_totalMarks" type="number" min="0" />
+      </div>
+      <div>
+        <label for="f_instructor">Instructor:</label>
+        <input id="f_instructor" type="text" style="width:40%" />
+        <label for="f_semester" style="margin-left:12px;">Semester:</label>
+        <input id="f_semester" type="text" style="width:120px" />
+      </div>
+
+      <div style="margin-top:12px;">
+        <button id="downloadBtn">Download .docx</button>
+        <span id="formStatus" style="margin-left:12px;color:#666"></span>
+      </div>
+    </section>
+
+    <hr />
+    <p style="color:#666">Notes: The generator will omit student name/ID fields when Exam Type contains the word "final" (case-insensitive). Generation happens in your browser — no data is uploaded to a server.</p>
+  </main>
+
+  <script src="/scripts/create-exam.js"></script>
+</body>
+</html>

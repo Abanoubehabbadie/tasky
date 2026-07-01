@@ -1,158 +1,22 @@
-<!-- Add a simple UI to generate and download .docx exams without login -->
-<div id="exam-generator" style="margin:24px;padding:16px;border:1px solid #ddd;background:#fff;">
-  <h2>Create & Download Exam (no login)</h2>
-  <p>Select a course and fill exam details, then click Download to generate a .docx in your browser.</p>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tasky — Exams</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <main style="padding:24px;">
+    <h1>Tasky — Exam Tools</h1>
+    <p>Use the button below to create an exam. No login required — you'll be taken to a page that loads courses from courses.xlsx (or lets you upload it) and generates a .docx from the template.</p>
 
-  <div>
-    <label for="courseSelect">Course:</label>
-    <select id="courseSelect"><option>Loading courses...</option></select>
-  </div>
+    <p>
+      <a href="/create-exam.html"><button style="padding:12px 18px;font-size:16px;">Create exam</button></a>
+    </p>
 
-  <div>
-    <label for="examTitle">Exam Title:</label>
-    <input id="examTitle" type="text" placeholder="Quiz 1 — Chapter 3" />
-  </div>
+    <p>If you previously used the inline generator on this page, that has moved to the dedicated Create Exam page for better course filtering and upload fallback.</p>
 
-  <div>
-    <label for="examType">Exam Type:</label>
-    <input id="examType" type="text" placeholder="Quiz / Midterm / Final" />
-  </div>
-
-  <div>
-    <label for="examDate">Date:</label>
-    <input id="examDate" type="date" />
-  </div>
-
-  <div>
-    <label for="examDuration">Duration (minutes):</label>
-    <input id="examDuration" type="number" min="0" />
-  </div>
-
-  <div>
-    <label for="examInstructor">Instructor:</label>
-    <input id="examInstructor" type="text" placeholder="Instructor name" />
-  </div>
-
-  <div style="margin-top:12px;">
-    <button id="downloadExam">Download .docx</button>
-    <span id="genStatus" style="margin-left:8px;color:#666"></span>
-  </div>
-
-  <script>
-  // Inline script to load courses.xlsx and generate a .docx using SheetJS and docx (UMD builds required)
-  (async function(){
-    const rawXlsxUrl = 'https://raw.githubusercontent.com/Abanoubehabbadie/tasky/main/courses.xlsx';
-    const courseSelect = document.getElementById('courseSelect');
-    const status = document.getElementById('genStatus');
-
-    function setStatus(s){ status.textContent = s; }
-
-    async function fetchArrayBuffer(url){
-      const r = await fetch(url);
-      if(!r.ok) throw new Error('Failed to fetch ' + url);
-      return await r.arrayBuffer();
-    }
-
-    try{
-      setStatus('Loading courses...');
-      const ab = await fetchArrayBuffer(rawXlsxUrl);
-      const data = new Uint8Array(ab);
-      const workbook = XLSX.read(data, {type:'array'});
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const rows = XLSX.utils.sheet_to_json(sheet, {header:1});
-      // assume header row
-      const headers = rows[0].map(h=>String(h).toLowerCase());
-      const codeIdx = headers.indexOf('course code')>=0?headers.indexOf('course code'):0;
-      const nameIdx = headers.indexOf('course name')>=0?headers.indexOf('course name'):1;
-      // populate select
-      courseSelect.innerHTML = '';
-      for(let i=1;i<rows.length;i++){
-        const r = rows[i];
-        const code = r[codeIdx]||'';
-        const name = r[nameIdx]||code||('Course '+i);
-        const opt = document.createElement('option');
-        opt.value = i; // row index
-        opt.textContent = `${code} — ${name}`;
-        opt.dataset.code = code;
-        opt.dataset.name = name;
-        courseSelect.appendChild(opt);
-      }
-      setStatus('Courses loaded');
-    }catch(e){
-      console.error(e);
-      setStatus('Failed to load courses.xlsx: '+e.message);
-      courseSelect.innerHTML = '<option>Error loading courses</option>';
-      return;
-    }
-
-    document.getElementById('downloadExam').addEventListener('click', async function(){
-      setStatus('Generating .docx...');
-      try{
-        // Collect fields
-        const idx = parseInt(courseSelect.value,10);
-        const opt = courseSelect.options[courseSelect.selectedIndex];
-        const courseCode = opt && opt.dataset.code?opt.dataset.code.trim():'';
-        const courseName = opt && opt.dataset.name?opt.dataset.name.trim():'';
-        const examTitle = document.getElementById('examTitle').value || '';
-        const examType = document.getElementById('examType').value || '';
-        const examDate = document.getElementById('examDate').value || '';
-        const examDuration = document.getElementById('examDuration').value || '';
-        const instructor = document.getElementById('examInstructor').value || '';
-        const totalMarks = '';
-
-        // Build docx using docx.js UMD (docx.Document etc.)
-        const doc = new docx.Document();
-        const children = [];
-        const heading = examTitle || courseName || 'Exam';
-        children.push(new docx.Paragraph({text: heading, heading: docx.HeadingLevel.HEADING_1}));
-        children.push(new docx.Paragraph({text:`Course Name: ${courseName}`}));
-        children.push(new docx.Paragraph({text:`Course Code: ${courseCode}`}));
-        children.push(new docx.Paragraph({text:`Course Semester: `}));
-        children.push(new docx.Paragraph({text:`Instructor: ${instructor}`}));
-        children.push(new docx.Paragraph({text:`Exam Type: ${examType}`}));
-        children.push(new docx.Paragraph({text:`Date: ${examDate}`}));
-        children.push(new docx.Paragraph({text:`Duration: ${examDuration} minutes`}));
-        children.push(new docx.Paragraph({text:`Total Marks: ${totalMarks}`}));
-        children.push(new docx.Paragraph({text:''}));
-
-        // Instructions (short)
-        children.push(new docx.Paragraph({text:'Instructions (short):', bold:true}));
-        children.push(new docx.Paragraph({text:'- Answer all questions. Write your name and student ID on every page (omit for Final exams).'}));
-        children.push(new docx.Paragraph({text:''}));
-
-        // Instructions (long)
-        children.push(new docx.Paragraph({text:'Instructions (long):', bold:true}));
-        children.push(new docx.Paragraph({text:'- Read all questions carefully. Manage your time. Show all workings where applicable. Use the space provided or separate answer sheets as instructed. Mobile phones and calculators rules: follow the course policy. If you have any clarification requests, raise them early.'}));
-        children.push(new docx.Paragraph({text:''}));
-
-        // Student name/ID omitted for Final exams
-        if(!/final/i.test(examType)){
-          children.push(new docx.Paragraph({text:'Student name (write on paper): ______________________'}));
-          children.push(new docx.Paragraph({text:'Student ID (write on paper): ________________________'}));
-          children.push(new docx.Paragraph({text:''}));
-        }
-
-        // Answer key placeholder for instructors
-        children.push(new docx.Paragraph({text:'Answer Key (for instructors):', bold:true}));
-        children.push(new docx.Paragraph({text:''}));
-
-        doc.addSection({children});
-
-        const packer = new docx.Packer();
-        const blob = await packer.toBlob(doc);
-        const safeExamType = (examType||'exam').replace(/\s+/g,'_') || 'exam';
-        const fname = `exam-${courseCode || 'course'}-${safeExamType}.docx`;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();
-        URL.revokeObjectURL(url);
-        setStatus('Download started');
-      }catch(err){
-        console.error(err);
-        setStatus('Error generating .docx: '+err.message);
-      }
-    });
-  })();
-  </script>
-</div>
+  </main>
+</body>
+</html>

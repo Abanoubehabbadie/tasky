@@ -99,39 +99,50 @@
         const examDate = document.getElementById('examDate').value || '';
         const examDuration = document.getElementById('examDuration').value || '';
         const instructor = document.getElementById('examInstructor').value || '';
+        const totalMarks = '';
 
         // Build docx using docx.js UMD (docx.Document etc.)
         const doc = new docx.Document();
+        const children = [];
         const heading = examTitle || courseName || 'Exam';
-        doc.addSection({children:[
-          new docx.Paragraph({text: heading, heading: docx.HeadingLevel.HEADING_1}),
-          new docx.Paragraph({text:`Course: ${courseName} (${courseCode})`}),
-          new docx.Paragraph({text:`Instructor: ${instructor}`}),
-          new docx.Paragraph({text:`Semester: `}),
-          new docx.Paragraph({text:`Exam Type: ${examType}`}),
-          new docx.Paragraph({text:`Date: ${examDate}`}),
-          new docx.Paragraph({text:`Duration: ${examDuration} minutes`}),
-        ]});
+        children.push(new docx.Paragraph({text: heading, heading: docx.HeadingLevel.HEADING_1}));
+        children.push(new docx.Paragraph({text:`Course Name: ${courseName}`}));
+        children.push(new docx.Paragraph({text:`Course Code: ${courseCode}`}));
+        children.push(new docx.Paragraph({text:`Course Semester: `}));
+        children.push(new docx.Paragraph({text:`Instructor: ${instructor}`}));
+        children.push(new docx.Paragraph({text:`Exam Type: ${examType}`}));
+        children.push(new docx.Paragraph({text:`Date: ${examDate}`}));
+        children.push(new docx.Paragraph({text:`Duration: ${examDuration} minutes`}));
+        children.push(new docx.Paragraph({text:`Total Marks: ${totalMarks}`}));
+        children.push(new docx.Paragraph({text:''}));
+
+        // Instructions (short)
+        children.push(new docx.Paragraph({text:'Instructions (short):', bold:true}));
+        children.push(new docx.Paragraph({text:'- Answer all questions. Write your name and student ID on every page (omit for Final exams).'}));
+        children.push(new docx.Paragraph({text:''}));
+
+        // Instructions (long)
+        children.push(new docx.Paragraph({text:'Instructions (long):', bold:true}));
+        children.push(new docx.Paragraph({text:'- Read all questions carefully. Manage your time. Show all workings where applicable. Use the space provided or separate answer sheets as instructed. Mobile phones and calculators rules: follow the course policy. If you have any clarification requests, raise them early.'}));
+        children.push(new docx.Paragraph({text:''}));
 
         // Student name/ID omitted for Final exams
         if(!/final/i.test(examType)){
-          doc.addSection({children:[
-            new docx.Paragraph({text:'Student name (write on paper): ______________________'}),
-            new docx.Paragraph({text:'Student ID (write on paper): ________________________'}),
-          ]});
+          children.push(new docx.Paragraph({text:'Student name (write on paper): ______________________'}));
+          children.push(new docx.Paragraph({text:'Student ID (write on paper): ________________________'}));
+          children.push(new docx.Paragraph({text:''}));
         }
 
-        // Minimal body template
-        doc.addSection({children:[
-          new docx.Paragraph({text:'\nSection A — Multiple Choice Questions (Each question: 1 mark)'}),
-          new docx.Paragraph({text:'1. [Question text here]'}),
-          new docx.Paragraph({text:'   A. [Option A]'}),
-          new docx.Paragraph({text:'   B. [Option B]'}),
-        ]});
+        // Answer key placeholder for instructors
+        children.push(new docx.Paragraph({text:'Answer Key (for instructors):', bold:true}));
+        children.push(new docx.Paragraph({text:''}));
+
+        doc.addSection({children});
 
         const packer = new docx.Packer();
         const blob = await packer.toBlob(doc);
-        const fname = `exam-${courseCode || 'course'}-${(examType||'exam').replace(/\s+/g,'_')}.docx`;
+        const safeExamType = (examType||'exam').replace(/\s+/g,'_') || 'exam';
+        const fname = `exam-${courseCode || 'course'}-${safeExamType}.docx`;
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();

@@ -2,18 +2,23 @@
 
 Use this template to quickly create quizzes, midterms, practicals, or any exam. Copy this file into a new document or paste into your LMS/exam builder and fill the placeholders. Replace the bracketed fields with real values.
 
+Exam Title: [______________________]
 Course Name: [______________________]
 Course Code: [______________________]
 Course Semester: [______________________]
 Instructor Name: [______________________]
 
-Exam Type: [Quiz 1 / Quiz 2 / Quiz 3 / Midterm / Practical / Other: ________]
+Exam Type: [Quiz 1 / Quiz 2 / Quiz 3 / Midterm / Practical / Final / Other: ________]
 Date (optional): [YYYY-MM-DD]
 Duration: [______ minutes]
 Total Marks: [______]
 
+Important note about student identity fields
+- For most exams include the student name and student ID fields in the exam header so students can write them.
+- For Final exams: DO NOT include student name or student ID on the exam paper. If the Exam Type is "Final" (or contains the word "final"), leave the student name/ID fields out to preserve anonymity.
+
 Instructions (short):
-- Answer all questions. Write your name and student ID on every page.
+- Answer all questions. Write your name and student ID on every page (omit for Final exams).
 
 Instructions (long):
 - Read all questions carefully. Manage your time. Show all workings where applicable. Use the space provided or separate answer sheets as instructed. Mobile phones and calculators rules: follow the course policy. If you have any clarification requests, raise them early.
@@ -30,18 +35,22 @@ Privacy note: If you use online editors, check their privacy settings before sha
 
 Standalone template (no login required)
 
+Exam Title: [______________________]
 Course Name: [______________________]
 Course Code: [______________________]
 Course Semester: [______________________]
 Instructor Name: [______________________]
 
-Exam Type: [Quiz 1 / Quiz 2 / Quiz 3 / Midterm / Practical / Other: ________]
+Exam Type: [Quiz 1 / Quiz 2 / Quiz 3 / Midterm / Practical / Final / Other: ________]
 Date (optional): [YYYY-MM-DD]
 Duration: [______ minutes]
 Total Marks: [______]
 
+Student name (write on paper): [______________________]  (omit for Final exams)
+Student ID (write on paper): [______________________]    (omit for Final exams)
+
 Instructions (short):
-- Answer all questions. Write your name and student ID on every page.
+- Answer all questions. Write your name and student ID on every page (omit for Final exams).
 
 Instructions (long):
 - Read all questions carefully. Manage your time. Show all workings where applicable. Use the space provided or separate answer sheets as instructed. Mobile phones and calculators rules: follow the course policy. If you have any clarification requests, raise them early.
@@ -129,9 +138,8 @@ This repository includes a script scripts/generate_exams.py that reads an XLSX f
 
    python scripts/generate_exams.py courses.xlsx --out generated-exams
 
-The script looks for columns named (case-insensitive) "Course Code", "Course Name", "Semester" and "Instructor". If Semester or Instructor are not present in the sheet the script will leave those fields blank in the generated exam.
+The script looks for columns named (case-insensitive) "Course Code", "Course Name", "Semester", "Instructor" and optionally "Exam Type". If Exam Type is present and contains the word "final", the generated .docx will omit the student name/ID fields.
 
 Notes:
 - The generator creates files named generated-exams/exam-{COURSECODE}.docx.
 - By default the script processes the first worksheet in the XLSX. You can pass --sheet "SheetName" to select a different sheet.
-

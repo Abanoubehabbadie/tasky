@@ -15,6 +15,18 @@
         <input type="text" id="exam-title" required>
       </label>
 
+      <label>Exam Date
+        <input type="date" id="exam-date">
+      </label>
+
+      <label>Exam Type
+        <input type="text" id="exam-type" placeholder="e.g. Final, Midterm">
+      </label>
+
+      <label>Subject Code
+        <input type="text" id="exam-code" placeholder="e.g. MKT101">
+      </label>
+
       <label>Exam Description
         <textarea id="exam-desc" rows="3"></textarea>
       </label>
@@ -37,12 +49,19 @@
       <div class="form-actions">
         <button type="submit" class="btn primary">Save Exam</button>
         <button type="button" id="preview" class="btn">Preview JSON</button>
+        <button type="button" id="download-word" class="btn primary">Download Word (.docx) — Teacher copy</button>
       </div>
     </form>
 
     <pre id="output" class="output" hidden></pre>
+
+    <p class="note">Note: The Word template used is <code>Marketing of healthcare final exam.docx</code> in the repo. The template contains header placeholders ({{title}}, {{date}}, {{type}}, {{code}}). Fill those fields above and the values will be placed exactly into the template when you download the file. The downloaded document is a <strong>teacher copy</strong> — it includes correct answers and marks for each question.</p>
   </main>
 
+  <!-- Libraries for docx templating -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.6/pizzip.min.js"></script>
+  <script src="https://unpkg.com/docxtemplater@3.29.0/build/docxtemplater.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <script src="assets/js/create-exam.js"></script>
 </body>
 </html>

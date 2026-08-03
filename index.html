@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tasky — Exams</title>
-  <link rel="stylesheet" href="/style.css" />
+  <title>Tasky — Welcome</title>
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <main style="padding:24px;">
-    <h1>Tasky — Exam Tools</h1>
-    <p>Use the button below to create an exam. No login required — you'll be taken to a page that loads courses from courses.xlsx (or lets you upload it) and generates a .docx from the template.</p>
+  <main class="container">
+    <h1>Welcome to Tasky</h1>
+    <p class="subtitle">Create tasks or exams quickly.</p>
 
-    <p>
-      <a href="/create-exam.html"><button style="padding:12px 18px;font-size:16px;">Create exam</button></a>
-    </p>
+    <div class="buttons">
+      <a class="btn" href="login.html">Login to make task</a>
+      <a class="btn primary" href="create-exam.html">Create Exam</a>
+    </div>
 
-    <p>If you previously used the inline generator on this page, that has moved to the dedicated Create Exam page for better course filtering and upload fallback.</p>
-
+    <footer class="footer">© Tasky</footer>
   </main>
 </body>
 </html>

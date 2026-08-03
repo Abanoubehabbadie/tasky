@@ -39,6 +39,12 @@
         <input type="number" id="exam-marks" min="1" value="100">
       </label>
 
+      <div style="display:flex;gap:8px;align-items:center;margin:12px 0;">
+        <input type="file" id="excel-file" accept=".xlsx,.xls" />
+        <button type="button" id="load-excel" class="btn">Load from Excel</button>
+        <button type="button" id="load-repo-excel" class="btn">Load repo courses.xlsx</button>
+      </div>
+
       <div class="questions-header">
         <h2>Questions</h2>
         <button type="button" id="add-question" class="btn small">Add Question</button>
@@ -55,13 +61,14 @@
 
     <pre id="output" class="output" hidden></pre>
 
-    <p class="note">Note: The Word template used is <code>Marketing of healthcare final exam.docx</code> in the repo. The template contains header placeholders ({{title}}, {{date}}, {{type}}, {{code}}). Fill those fields above and the values will be placed exactly into the template when you download the file. The downloaded document is a <strong>teacher copy</strong> — it includes correct answers and marks for each question.</p>
+    <p class="note">Note: The Word template used is <code>Marketing of healthcare final exam.docx</code> in the repo. The template contains header placeholders ({{title}}, {{date}}, {{type}}, {{code}}). Fill those fields above or load them from an Excel file. The downloaded document is a <strong>teacher copy</strong> — it includes correct answers and marks for each question.</p>
   </main>
 
-  <!-- Libraries for docx templating -->
+  <!-- Libraries for docx templating and Excel parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.6/pizzip.min.js"></script>
   <script src="https://unpkg.com/docxtemplater@3.29.0/build/docxtemplater.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="assets/js/create-exam.js"></script>
 </body>
 </html>
